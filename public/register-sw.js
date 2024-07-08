@@ -14,6 +14,9 @@ const swAllowedHostnames = ["localhost", "127.0.0.1"];
  * Used in 404.html and index.html
  */
 async function registerSW() {
+  let connection = new BareMux.BareMuxConnection("/baremux/worker.js")
+  let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
+  await connection.setTransport("/epoxy/module.js", [{ wisp: wispUrl }]);
   if (!navigator.serviceWorker) {
     if (
       location.protocol !== "https:" &&
@@ -25,8 +28,4 @@ async function registerSW() {
   }
 
   await navigator.serviceWorker.register(stockSW);
-
-  // Register the EpoxyClient transport to be used for network requests
-  let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
-  await BareMux.SetTransport("EpxMod.EpoxyClient", { wisp: wispUrl });
 }
